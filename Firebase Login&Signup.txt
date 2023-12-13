@@ -1,0 +1,20 @@
+///////////////// Upload Image to Firebase Storage and get link of the uploaded image ////////////////////
+
+Future<String?> uploadImageToFirebase(String? imagePath) async {
+    final obj = Provider.of<ProfileProvider>(context, listen: false);
+    try {
+      if (imagePath != null) {
+        final Reference storageRef = FirebaseStorage.instance.ref().child(
+            'images/${DateTime.now().millisecondsSinceEpoch.toString()}');
+        final UploadTask uploadTask = storageRef.putFile(File(imagePath));
+        await uploadTask.whenComplete(() {});
+        final String imageURL = await storageRef.getDownloadURL();
+        obj.setImageLink(imageURL);
+        return imageURL;
+      }
+      return null;
+    } catch (e) {
+      print('Error uploading profile image: $e');
+      return null;
+    }
+  }
